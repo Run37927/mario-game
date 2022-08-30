@@ -4,7 +4,9 @@ const c = canvas.getContext('2d')
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const gravity = 1.5
+const gravity = 1.5;
+
+// create player class
 class Player {
     constructor() {
         this.position = {
@@ -35,9 +37,32 @@ class Player {
             this.velocity.y = 0;
         }
     }
-}
+};
+// end of player class
+
+
+//create platform class
+class Platform {
+    constructor() {
+        this.position= {
+            x: 200,
+            y: 100
+        }
+
+        this.width = 200
+        this.height = 20
+    }
+
+    draw(){
+        c.fillStyle = 'brown'
+        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+};
+// end of platform class
+
 
 const player = new Player();
+const platform = new Platform();
 const keys = {
     right: {
         pressed: false
@@ -47,10 +72,14 @@ const keys = {
     }
 }
 
+
+// things happening here
 function animate(){
     requestAnimationFrame(animate);
     c.clearRect(0, 0, canvas.width, canvas.height)
     player.update();
+    platform.draw();
+
 
     if (keys.right.pressed){
         player.velocity.x = 5;
@@ -58,11 +87,18 @@ function animate(){
         player.velocity.x = -5;
     }else {
         player.velocity.x = 0;
+    };
+
+    // rectangle collision detection
+    if(player.position.y + player.height <= platform.position.y && player.position.y + player.height+ player.velocity.y >= platform.position.y){
+        player.velocity.y = 0;
     }
 }
 
 animate();
 
+
+// press down key
 window.addEventListener('keydown', ({ keyCode }) => {
     switch (keyCode) {
         case 65:
@@ -83,7 +119,7 @@ window.addEventListener('keydown', ({ keyCode }) => {
     }
 })
 
-
+// lift up key
 window.addEventListener('keyup', ({ keyCode }) => {
     switch (keyCode) {
         case 65:
