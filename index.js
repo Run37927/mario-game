@@ -21,19 +21,19 @@ class Player {
         this.height = 50
     }
 
-    draw(){
+    draw() {
         c.fillStyle = 'purple';
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 
-    update(){
+    update() {
         this.draw()
         this.position.y += this.velocity.y;
         this.position.x += this.velocity.x;
 
-        if (this.position.y + this.height + this.velocity.y <= canvas.height){
+        if (this.position.y + this.height + this.velocity.y <= canvas.height) {
             this.velocity.y += gravity;
-        }else {
+        } else {
             this.velocity.y = 0;
         }
     }
@@ -43,18 +43,18 @@ class Player {
 
 //create platform class
 class Platform {
-    constructor() {
-        this.position= {
-            x: 200,
-            y: 100
+    constructor(x, y) {
+        this.position = {
+            x: x,
+            y: y
         }
 
         this.width = 200
         this.height = 20
     }
 
-    draw(){
-        c.fillStyle = 'brown'
+    draw() {
+        c.fillStyle = 'green'
         c.fillRect(this.position.x, this.position.y, this.width, this.height)
     }
 };
@@ -62,7 +62,7 @@ class Platform {
 
 
 const player = new Player();
-const platform = new Platform();
+const platforms = [new Platform(200, 200), new Platform(550, 350), new Platform(800, 500)];
 const keys = {
     right: {
         pressed: false
@@ -70,29 +70,44 @@ const keys = {
     left: {
         pressed: false
     }
-}
+};
 
 
 // things happening here
-function animate(){
+function animate() {
     requestAnimationFrame(animate);
     c.clearRect(0, 0, canvas.width, canvas.height)
     player.update();
-    platform.draw();
+
+    platforms.forEach((platform) => {
+        platform.draw();
+    })
 
 
-    if (keys.right.pressed){
+    if (keys.right.pressed && player.position.x < 400) {
         player.velocity.x = 5;
-    }else if(keys.left.pressed){
+    } else if (keys.left.pressed && player.position.x > 100) {
         player.velocity.x = -5;
-    }else {
+    } else {
         player.velocity.x = 0;
+
+        if (keys.right.pressed) {
+            platforms.forEach((platform) => {
+                platform.position.x -= 5
+            })
+        } else if (keys.left.pressed) {
+            platforms.forEach((platform) => {
+                platform.position.x += 5
+            })
+        }
     };
 
-    // rectangle collision detection
-    if(player.position.y + player.height <= platform.position.y && player.position.y + player.height+ player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width){
-        player.velocity.y = 0;
-    }
+    // platform collision detection
+    platforms.forEach((platform) => {
+        if (player.position.y + player.height <= platform.position.y && player.position.y + player.height + player.velocity.y >= platform.position.y && player.position.x + player.width >= platform.position.x && player.position.x <= platform.position.x + platform.width) {
+            player.velocity.y = 0;
+        };
+    });
 }
 
 animate();
